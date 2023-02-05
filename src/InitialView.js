@@ -46,6 +46,10 @@ const InitialView = () => {
     const [category3, setCategory3] = useState(null)
     const [category4, setCategory4] = useState(null)
 
+    const [currentScore, setCurrentScore] = useState(null)
+
+    let firstIn
+
     const onStoryChange = (e) => {
         setActivePanel(e.currentTarget.dataset.story)
     }
@@ -82,7 +86,7 @@ const InitialView = () => {
     }
 
     const sendData = (inf) => {
-        setDoc(doc(fireStore, 'users', inf.idVK.toString()), inf).then(docRef => {
+        setDoc(doc(fireStore, 'users', inf.id.toString()), inf).then(docRef => {
             console.log("Information has been added successfully", docRef);
         }).catch(error => {
             // console.error(error)
@@ -92,67 +96,61 @@ const InitialView = () => {
 
 
     useEffect(() => {
+
+        if (localStorage.getItem('category1') === undefined || localStorage.getItem('category2') === undefined
+            || localStorage.getItem('category3') === undefined || localStorage.getItem('category4') === undefined
+            || localStorage.getItem('CurrentScore') === undefined || localStorage.getItem('bestScore') === undefined
+            || localStorage.getItem('lastEnterTime') === undefined
+            || localStorage.getItem('category1') === null || localStorage.getItem('category2') === null
+            || localStorage.getItem('category3') === null || localStorage.getItem('category4') === null
+            || localStorage.getItem('currentScore') === null || localStorage.getItem('bestScore') === null
+            || localStorage.getItem('lastEnterTime') === null){
+
+            localStorage.setItem('category1', 70)
+            localStorage.setItem('category2', 70)
+            localStorage.setItem('category3', 70)
+            localStorage.setItem('category4', 70)
+            localStorage.setItem('currentScore', 0)
+            localStorage.setItem('bestScore', 0)
+            localStorage.setItem('lastEnterTime', new Date())
+
+            firstIn = true
+        } else {
+            firstIn = false
+        }
+
         bridge.send('VKWebAppGetUserInfo')
             .then((data) => {
                 // RECIVE AND SEND
-                const q = query(collection(fireStore, "users"), where("idVK", "!=", data.id))
+                const q = query(collection(fireStore, "users"), where("id", "==", data.id))
                 // const q = query(collection(fireStore, "users"), where("bestScore", "==", 0))
+
                 reciveData(q).then(inf => {
                     if (inf.length === 1) {
-                        let tempLastScore = inf[0].data().lastScore
-                        let tempBestScore = inf[0].data().bestScore
-                        let tempLastEnterTime = inf[0].data().lastEnterTime
+                        let serverBestScore = inf[0].data().bestScore
 
-                        let tempCategory1 = inf[0].data().category1
-                        let tempCategory2 = inf[0].data().category2
-                        let tempCategory3 = inf[0].data().category3
-                        let tempCategory4 = inf[0].data().category4
+                        console.error(data.id, localStorage.getItem("bestScore"), localStorage.getItem("a"))
 
-                        if (localStorage.getItem('category1')  <= tempCategory1 && localStorage.getItem('category2') <= tempCategory2
-                            && localStorage.getItem('category3') <= tempCategory3 && localStorage.getItem('category4') <= tempCategory4){
-
-                            localStorage.setItem('category1', tempCategory1)
-                            localStorage.setItem('category2', tempCategory2)
-                            localStorage.setItem('category3', tempCategory3)
-                            localStorage.setItem('category4', tempCategory4)
-
-                            setCategory1(localStorage.getItem('category1'))
-                            setCategory2(localStorage.getItem('category2'))
-                            setCategory3(localStorage.getItem('category3'))
-                            setCategory4(localStorage.getItem('category4'))
-
-                        } else{
+                        if (serverBestScore < localStorage.getItem('bestScore')){
                             sendData({
-                                category1: localStorage.getItem('category1'),
-                                category2: localStorage.getItem('category2'),
-                                category3: localStorage.getItem('category3'),
-                                category4: localStorage.getItem('category4'),
-                                lastScore: tempLastScore,
-                                idVK: data.id
+                                first_name: inf[0].data().first_name,
+                                last_name: inf[0].data().last_name,
+                                bestScore: Number(localStorage.getItem('bestScore')),
+                                id: inf[0].data().id
                             })
                         }
-
                     } else {
 
-                        localStorage.setItem('category1', 70)
-                        localStorage.setItem('category2', 70)
-                        localStorage.setItem('category3', 70)
-                        localStorage.setItem('category4', 70)
-
-                        setCategory1(localStorage.getItem('category1'))
-                        setCategory2(localStorage.getItem('category2'))
-                        setCategory3(localStorage.getItem('category3'))
-                        setCategory4(localStorage.getItem('category4'))
+                        console.error("First sing person", inf.length)
+                        console.error(data.id, localStorage.getItem("bestScore"))
 
                         sendData({
-                            category1: localStorage.getItem('category1'),
-                            category2: localStorage.getItem('category2'),
-                            category3: localStorage.getItem('category3'),
-                            category4: localStorage.getItem('category4'),
-                            lastScore: 0, bestScore: 0, idVK: data.id
+                            first_name: data.first_name,
+                            last_name: data.last_name,
+                            bestScore: Number(localStorage.getItem('bestScore')),
+                            id: data.id
                         })
-
-                        console.error("First sing person")
+                        console.error("First sing person2")
 
                     }
 
@@ -166,6 +164,15 @@ const InitialView = () => {
         })
 
 
+        setCategory1(localStorage.getItem('category1'))
+        setCategory2(localStorage.getItem('category2'))
+        setCategory3(localStorage.getItem('category3'))
+        setCategory4(localStorage.getItem('category4'))
+
+        setCurrentScore(localStorage.getItem('currentScore'))
+
+
+
         setPopout(null)
 
 
@@ -174,10 +181,29 @@ const InitialView = () => {
     }, [])
 
 
-    const lessOrEqual100 = (v, add) => {
-        return v + add <= 100 ? v + add : 100
+    const Bw0and100 = (v, step) => {
+        v = Number(v)
+        if (v + step <= 100 && v + step >= 0)
+            return v + step
+        else if (v + step < 0)
+            return 0
+        else if (v + step > 100)
+            return 100
     }
 
+    const updateStorage = () => {
+        localStorage.setItem('category1', category1)
+        localStorage.setItem('category2', category2)
+        localStorage.setItem('category3', category3)
+        localStorage.setItem('category4', category4)
+
+        localStorage.setItem('currentScore', currentScore)
+
+        if (bestScore < currentScore)
+            localStorage.setItem('bestScore', currentScore)
+
+        localStorage.setItem('lastEnterTime', new Date())
+    }
 
     return (
         <ConfigProvider appearance={scheme}>
@@ -236,7 +262,12 @@ const InitialView = () => {
                                             //     <Avatar src={fetchedUser.photo_200}/> : null}
                                             description={"Нужно упорно репетировать..."}
                                             after={<Icon28AddOutline/>}
-                                            onClick={() => setPercent(lessOrEqual100(category1, 2))}
+                                            onClick={
+                                                () => {
+                                                    setCategory1(Bw0and100(category1, 2))
+                                                    updateStorage()
+                                                }
+                                            }
                                         >
                                             Репетиция в авангарде
                                         </Cell>
@@ -253,13 +284,18 @@ const InitialView = () => {
                                             //     <Avatar src={fetchedUser.photo_200}/> : null}
                                             description={"А он еще и духом сильный!"}
                                             after={<Icon28AddOutline/>}
-                                            onClick={() => localStorage.setItem('myCat', 'Tom')}
+                                            onClick={
+                                                () => {
+                                                    setCategory2(Bw0and100(category2, 2))
+                                                    updateStorage()
+                                                }
+                                            }
                                         >
                                             Качалочка
                                         </Cell>
 
-                                        <FormItem id="progresslabel" top="Прогресс: 40%">
-                                            <Progress aria-labelledby="progresslabel" value={40}/>
+                                        <FormItem id="progresslabel" top={`Прогресс: ${category2}%`}>
+                                            <Progress aria-labelledby="progresslabel" value={category2}/>
                                         </FormItem>
                                     </Group>
 
@@ -270,13 +306,18 @@ const InitialView = () => {
                                             //     <Avatar src={fetchedUser.photo_200}/> : null}
                                             description={"Блин, нужно же еще и диплом писать!"}
                                             after={<Icon28AddOutline/>}
-                                            onClick={() => console.log(localStorage.getItem('myCat'))}
+                                            onClick={
+                                                () => {
+                                                    setCategory3(Bw0and100(category3, 2))
+                                                    updateStorage()
+                                                }
+                                            }
                                         >
                                             Учеба
                                         </Cell>
 
-                                        <FormItem id="progresslabel" top="Прогресс: 40%">
-                                            <Progress aria-labelledby="progresslabel" value={40}/>
+                                        <FormItem id="progresslabel" top={`Прогресс: ${category3}%`}>
+                                            <Progress aria-labelledby="progresslabel" value={category3}/>
                                         </FormItem>
                                     </Group>
 
@@ -287,12 +328,18 @@ const InitialView = () => {
                                             //     <Avatar src={fetchedUser.photo_200}/> : null}
                                             description={"Роберт Фаридович будет доволен"}
                                             after={<Icon28AddOutline/>}
+                                            onClick={
+                                                () => {
+                                                    setCategory4(Bw0and100(category4, 2))
+                                                    updateStorage()
+                                                }
+                                            }
                                         >
                                             Участие в мероприятиях
                                         </Cell>
 
-                                        <FormItem id="progresslabel" top="Прогресс: 40%">
-                                            <Progress aria-labelledby="progresslabel" value={40}/>
+                                        <FormItem id="progresslabel" top={`Прогресс: ${category4}%`}>
+                                            <Progress aria-labelledby="progresslabel" value={category4}/>
                                         </FormItem>
                                     </Group>
 

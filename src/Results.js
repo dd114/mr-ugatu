@@ -40,10 +40,10 @@ const Results = () => {
             console.log("snap", snap)
             console.log("snap.docs", snap.docs)
             snap.docs.forEach(element => {
-                let idVK = element._document.data.value.mapValue.fields.idVK.integerValue
+                let id = element._document.data.value.mapValue.fields.id.integerValue
                 let bestScore = element._document.data.value.mapValue.fields.bestScore.integerValue
-                console.log("element", idVK)
-                topId.push(idVK)
+                console.log("element", id)
+                topId.push(id)
                 topBestScore.push(bestScore)
             })
 
@@ -64,7 +64,7 @@ const Results = () => {
 
                 data.response.map((el, i) => {
                     tempArr.push({
-                        idVK: el.id, first_name: el.first_name,
+                        id: el.id, first_name: el.first_name,
                         last_name: el.last_name, ava: el.photo_100, bestScore: topBestScore[i]
                     })
                 })
