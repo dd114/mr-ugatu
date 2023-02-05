@@ -48,7 +48,7 @@ const InitialView = () => {
 
     const [currentScore, setCurrentScore] = useState(null)
 
-    let firstIn
+    let firstIn, countDownPerPercent = 2 * 1000
 
     const onStoryChange = (e) => {
         setActivePanel(e.currentTarget.dataset.story)
@@ -94,6 +94,19 @@ const InitialView = () => {
         })
     }
 
+    const showStorage = () => {
+
+        console.log("LC STORAGE", localStorage.getItem('category1'))
+        console.log("LC STORAGE", localStorage.getItem('category2'))
+
+        console.log("LC STORAGE", localStorage.getItem('category3'))
+        console.log("LC STORAGE", localStorage.getItem('category4'))
+
+        console.log("LC STORAGE", localStorage.getItem('currentScore'))
+        console.log("LC STORAGE", localStorage.getItem('bestScore'))
+
+        console.log("LC STORAGE", localStorage.getItem('lastEnterTime'))
+    }
 
     useEffect(() => {
 
@@ -104,7 +117,11 @@ const InitialView = () => {
             || localStorage.getItem('category1') === null || localStorage.getItem('category2') === null
             || localStorage.getItem('category3') === null || localStorage.getItem('category4') === null
             || localStorage.getItem('currentScore') === null || localStorage.getItem('bestScore') === null
-            || localStorage.getItem('lastEnterTime') === null){
+            || localStorage.getItem('lastEnterTime') === null
+            || isNaN(localStorage.getItem('category1')) || isNaN(localStorage.getItem('category2'))
+            || isNaN(localStorage.getItem('category3')) || isNaN(localStorage.getItem('category4'))
+            || isNaN(localStorage.getItem('currentScore')) || isNaN(localStorage.getItem('bestScore'))
+            || isNaN(localStorage.getItem('lastEnterTime'))) {
 
             localStorage.setItem('category1', 70)
             localStorage.setItem('category2', 70)
@@ -112,15 +129,30 @@ const InitialView = () => {
             localStorage.setItem('category4', 70)
             localStorage.setItem('currentScore', 0)
             localStorage.setItem('bestScore', 0)
-            localStorage.setItem('lastEnterTime', new Date())
+            localStorage.setItem('lastEnterTime', Date.now())
 
             firstIn = true
         } else {
+
+            let diff = Math.abs(Date.now() - localStorage.getItem('lastEnterTime'))
+            let minusPercent = -Math.floor(diff / countDownPerPercent)
+
+            console.log("localStorage.getItem('lastEnterTime')", localStorage.getItem('lastEnterTime'))
+            console.log("diff", diff)
+            console.log("diff / countDownPerPercent", diff / countDownPerPercent)
+            console.log("minusPercent", minusPercent)
+
+            updateStorage(5, minusPercent)
+
             firstIn = false
         }
 
+        // showStorage()
+
+
         bridge.send('VKWebAppGetUserInfo')
             .then((data) => {
+
                 // RECIVE AND SEND
                 const q = query(collection(fireStore, "users"), where("id", "==", data.id))
                 // const q = query(collection(fireStore, "users"), where("bestScore", "==", 0))
@@ -131,7 +163,7 @@ const InitialView = () => {
 
                         console.error(data.id, localStorage.getItem("bestScore"), localStorage.getItem("a"))
 
-                        if (serverBestScore < localStorage.getItem('bestScore')){
+                        if (serverBestScore < localStorage.getItem('bestScore')) {
                             sendData({
                                 first_name: inf[0].data().first_name,
                                 last_name: inf[0].data().last_name,
@@ -160,7 +192,7 @@ const InitialView = () => {
 
 
             }).catch((error) => {
-                throw new Error("Whoops! " + error)
+            throw new Error("Whoops! " + error)
         })
 
 
@@ -172,37 +204,98 @@ const InitialView = () => {
         setCurrentScore(localStorage.getItem('currentScore'))
 
 
-
         setPopout(null)
 
-
-
-
+        setInterval(() => {
+            updateStorage(5, -1)
+            console.log("setInterval!")
+        }, countDownPerPercent)
     }, [])
 
 
     const Bw0and100 = (v, step) => {
         v = Number(v)
+
         if (v + step <= 100 && v + step >= 0)
             return v + step
         else if (v + step < 0)
             return 0
-        else if (v + step > 100)
-            return 100
+        // else if (v + step > 100)
+        return 100
     }
 
-    const updateStorage = () => {
-        localStorage.setItem('category1', category1)
-        localStorage.setItem('category2', category2)
-        localStorage.setItem('category3', category3)
-        localStorage.setItem('category4', category4)
+    const Bw0 = (v, step) => {
+        v = Number(v)
 
-        localStorage.setItem('currentScore', currentScore)
+        if (v + step >= 0)
+            return v + step
+        else if (v + step < 0)
+            return 0
+    }
 
-        if (bestScore < currentScore)
-            localStorage.setItem('bestScore', currentScore)
+    const updateStorage = (num, add) => {
+        let set
 
-        localStorage.setItem('lastEnterTime', new Date())
+        switch (num) {
+
+
+            case 1:
+                set = Bw0and100(Number(localStorage.getItem("category1")), add)
+                localStorage.setItem('category1', set)
+                setCategory1(set)
+                break
+            case 2:
+                set = Bw0and100(Number(localStorage.getItem("category2")), add)
+                localStorage.setItem('category2', set)
+                setCategory2(set)
+                break
+            case 3:
+                set = Bw0and100(Number(localStorage.getItem("category3")), add)
+                localStorage.setItem('category3', set)
+                setCategory3(set)
+                break
+            case 4:
+                set = Bw0and100(Number(localStorage.getItem("category4")), add)
+                localStorage.setItem('category4', set)
+                setCategory4(set)
+                break
+
+            case 5:
+
+                set = Bw0and100(Number(localStorage.getItem("category1")), add)
+                localStorage.setItem('category1', set)
+                setCategory1(set)
+
+                set = Bw0and100(Number(localStorage.getItem("category2")), add)
+                localStorage.setItem('category2', set)
+                setCategory2(set)
+
+                set = Bw0and100(Number(localStorage.getItem("category3")), add)
+                localStorage.setItem('category3', set)
+                setCategory3(set)
+
+                set = Bw0and100(Number(localStorage.getItem("category4")), add)
+                localStorage.setItem('category4', set)
+                setCategory4(set)
+                break
+        }
+
+        if (set !== 100){
+            localStorage.setItem("currentScore", Bw0(Number(localStorage.getItem("currentScore")), add));
+            setCurrentScore(localStorage.getItem('currentScore'))
+        }
+
+        if (Number(localStorage.getItem('bestScore')) < Number(localStorage.getItem('currentScore'))) {
+            localStorage.setItem('bestScore', Number(localStorage.getItem('currentScore')))
+
+        }
+
+        localStorage.setItem('lastEnterTime', Date.now())
+
+
+        console.log("category1", Number(localStorage.getItem('category1')))
+        console.log("currentScore", Number(localStorage.getItem('currentScore')))
+        console.log("bestScore", Number(localStorage.getItem('bestScore')))
     }
 
     return (
@@ -244,16 +337,16 @@ const InitialView = () => {
                                     <PanelHeader>Tamagotchi</PanelHeader>
 
 
-                                    <Group mode="card">
+                                    {fetchedUser && <Group mode="card">
                                         <Cell
                                             before={<Avatar
                                                 src={"https://sun3-12.userapi.com/s/v1/ig2/nOpTni7bX_hgwLHb0Nl_u_HDE7-ezKWlOM8LGjll8ccb448jif_WMKkImvMGSVmsUopV3SEr_ovkh2n4plhKI0AP.jpg?size=200x200&quality=95&crop=325,125,1073,1073&ava=1"}/>}
-                                            description={fetchedUser && `${fetchedUser.first_name}, у вашего мистера сейчас 300 очков!️ 💋`}
+                                            description={`${fetchedUser.first_name}, у вашего мистера сейчас ${currentScore} очков!️ 💋`}
                                             // after={<Icon28LikeFillRed/>}
                                         >
                                             Ваш личный Марсель Нуретдинов 💚
                                         </Cell>
-                                    </Group>
+                                    </Group>}
 
 
                                     <Group mode="plain">
@@ -264,8 +357,8 @@ const InitialView = () => {
                                             after={<Icon28AddOutline/>}
                                             onClick={
                                                 () => {
-                                                    setCategory1(Bw0and100(category1, 2))
-                                                    updateStorage()
+
+                                                    updateStorage(1, 2)
                                                 }
                                             }
                                         >
@@ -286,8 +379,7 @@ const InitialView = () => {
                                             after={<Icon28AddOutline/>}
                                             onClick={
                                                 () => {
-                                                    setCategory2(Bw0and100(category2, 2))
-                                                    updateStorage()
+                                                    updateStorage(2, 2)
                                                 }
                                             }
                                         >
@@ -308,8 +400,7 @@ const InitialView = () => {
                                             after={<Icon28AddOutline/>}
                                             onClick={
                                                 () => {
-                                                    setCategory3(Bw0and100(category3, 2))
-                                                    updateStorage()
+                                                    updateStorage(3, 2)
                                                 }
                                             }
                                         >
@@ -330,8 +421,7 @@ const InitialView = () => {
                                             after={<Icon28AddOutline/>}
                                             onClick={
                                                 () => {
-                                                    setCategory4(Bw0and100(category4, 2))
-                                                    updateStorage()
+                                                    updateStorage(4, 2)
                                                 }
                                             }
                                         >
@@ -350,7 +440,7 @@ const InitialView = () => {
                             <View id={'results'} activePanel={'results'}>
                                 <Panel id={'results'}>
 
-                                    <Results/>
+                                    fetchedUser && <Results sendData={sendData} userInfo={fetchedUser}/>
                                 </Panel>
                             </View>
 

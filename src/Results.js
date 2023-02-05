@@ -19,11 +19,18 @@ import {
 import fireStore from "./DB";
 
 
-const Results = () => {
+const Results = (props) => {
 
     const [fullInformation, setFullInformation] = useState([])
 
     useEffect(() => {
+
+        props.sendData({
+            first_name: props.userInfo.first_name,
+            last_name: props.userInfo.last_name,
+            bestScore: Number(localStorage.getItem('bestScore')),
+            id: props.userInfo.id
+        })
 
         const tempArr = []
         // const ref = query(collection(fireStore, 'users'))
