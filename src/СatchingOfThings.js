@@ -47,18 +47,18 @@ const CatchingOfThings = (props) => {
         let timer;
         //Keeps track of hi score
 
-        let timer2
+        const touches = []
 
 
         let hiscore = localStorage.getItem('catchingOfThingsBestScore');
 
         let player;
         let fruits = [];
-        let numberOfFruits = 10;
+        let numberOfFruits = 5;
 
         //Player constructor
         function Player() {
-            this.gameOver = true;
+            this.gameOver = false;
             this.score = 0;
             this.fruitsCollected = 0;
             this.fruitsMissed = 0;
@@ -178,30 +178,30 @@ const CatchingOfThings = (props) => {
 
         //Перехватываем события
 
-        canvas.addEventListener("touchstart", function (e) {
+        document.addEventListener("touchstart", function (e) {
 
 
-            if (player.gameOver === true) {
-                window.clearTimeout(timer);
-                main(true);
-            } else {
+            if (player.gameOver === false) {
                 let x = e.changedTouches[0].clientX
 
 
                 if (x <= canvas.width / 2) {
-                    timer2 = window.setInterval(() => player.moveLeft(), 10)
-                } else if (x > canvas.width / 2) {
-                    timer2 = window.setInterval(() => player.moveRight(), 10)
+                    touches.push(window.setInterval(() => player.moveLeft(), 20))
+                } else {
+                    touches.push(window.setInterval(() => player.moveRight(), 20))
                 }
+
+            } else {
+                window.clearTimeout(timer);
+                main(true);
             }
 
 
         });
 
-        canvas.addEventListener("touchend", function (e) {
-
-            window.clearTimeout(timer2)
-
+        document.addEventListener("touchend", function (e) {
+            touches.forEach((touch) => window.clearTimeout(touch))
+            touches.length = 0
         });
 
         // canvas.addEventListener("touchmove", function (e) {
@@ -216,14 +216,15 @@ const CatchingOfThings = (props) => {
         // }); //Движение пальцем по экрану
 
 
-        main(false);
+        main(true);
 
         //Fills an array of fruits, creates a player and starts the game
         function main(isStartGame) {
 
 
-            // contextBack.font = "bold 23px Velvetica";
-            // contextBack.fillStyle = "black";
+            context.font = "bold 20px Velvetica";
+            context.fillStyle = "black";
+
             player = new Player();
             fruits = []
 
@@ -244,10 +245,9 @@ const CatchingOfThings = (props) => {
         function startGame(isStartGame) {
             context.drawImage(background, 0, 0, canvas.width, canvas.height)
 
-            if (isStartGame)
-                updateGame();
+            timer = setInterval(updateGame, 30)
 
-            setTimeout(() => window.requestAnimationFrame(drawGame), 10)
+            requestAnimationFrame(drawGame)
 
         }
 
@@ -261,7 +261,6 @@ const CatchingOfThings = (props) => {
             for (let j = 0; j < fruits.length; j++) {
                 fruits[j].fall();
             }
-            timer = window.setTimeout(updateGame, 30);
         }
 
 
@@ -281,10 +280,10 @@ const CatchingOfThings = (props) => {
                     fruits[j].render();
                 }
 
-                context.fillText("SCORE: " + player.score, canvas.width / 6, 50);
-                context.fillText("HI SCORE: " + hiscore, canvas.width / 6 * 2, 50);
-                context.fillText("FRUIT CAUGHT: " + player.fruitsCollected, canvas.width / 6 * 3, 50);
-                context.fillText("FRUIT MISSED: " + player.fruitsMissed, canvas.width / 6 * 4, 50);
+                context.fillText("SCORE: " + player.score, 20, 50);
+                context.fillText("BEST SCORE: " + hiscore, canvas.width / 6 * 3 - 80, 50);
+                // context.fillText("FRUIT CAUGHT: " + player.fruitsCollected, canvas.width / 6 * 3, 50);
+                context.fillText("MISSED: " + player.fruitsMissed, canvas.width - 120, 50);
 
                 window.requestAnimationFrame(drawGame);
 
@@ -312,10 +311,10 @@ const CatchingOfThings = (props) => {
 
                 context.fillText("TOUCH TO START", (canvas.width / 2) - 80, canvas.height / 3);
 
-                context.fillText("SCORE: " + player.score, canvas.width / 6, 50);
-                context.fillText("HI SCORE: " + hiscore, canvas.width / 6 * 3, 50);
+                context.fillText("SCORE: " + player.score, 20, 50);
+                context.fillText("BEST SCORE: " + hiscore, canvas.width / 6 * 3 - 80, 50);
                 // context.fillText("FRUIT CAUGHT: " + player.fruitsCollected, canvas.width / 6 * 3, 50);
-                context.fillText("FRUIT MISSED: " + player.fruitsMissed, canvas.width / 6 * 5, 50);
+                context.fillText("MISSED: " + player.fruitsMissed, canvas.width - 120, 50);
 
                 props.updateStorage(4, player.score)
 
