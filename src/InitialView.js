@@ -9,13 +9,14 @@ import {
     SplitLayout,
     Epic, TabbarItem, Tabbar,
     PanelHeader, Group, ScreenSpinner,
-    Cell, Avatar, Progress, FormItem
+    Cell, Avatar, Progress, FormItem, PanelHeaderBack, CellButton, usePlatform, Platform
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import {Icon24GameOutline, Icon28NewsfeedOutline, Icon28AddOutline, Icon28LikeFillRed} from "@vkontakte/icons";
 
 
 import Results from "./Results";
+import СatchingOfThings from "./СatchingOfThings";
 
 import fireStore from "./DB";
 import {
@@ -48,7 +49,12 @@ const InitialView = () => {
 
     const [currentScore, setCurrentScore] = useState(null)
 
-    let firstIn, countDownPerPercent = 2 * 1000
+    const [catchingOfThings, setCatchingOfThings] = useState("game")
+
+    const platform = usePlatform();
+
+
+    let firstIn, countDownPerPercent = 10 * 1000
 
     const onStoryChange = (e) => {
         setActivePanel(e.currentTarget.dataset.story)
@@ -61,14 +67,14 @@ const InitialView = () => {
             }
         });
 
-        async function fetchData() {
-            const user = await bridge.send('VKWebAppGetUserInfo');
-            setUser(user);
-            // setPopout(null);
-        }
-
-        fetchData();
-    }, []);
+        // async function fetchData() {
+        //     const user = await bridge.send('VKWebAppGetUserInfo');
+        //     setUser(user);
+        //     // setPopout(null);
+        // }
+        //
+        // fetchData();
+    }, [])
 
     const reciveData = async (q) => {
 
@@ -123,13 +129,16 @@ const InitialView = () => {
             || isNaN(localStorage.getItem('currentScore')) || isNaN(localStorage.getItem('bestScore'))
             || isNaN(localStorage.getItem('lastEnterTime'))) {
 
-            localStorage.setItem('category1', 70)
-            localStorage.setItem('category2', 70)
-            localStorage.setItem('category3', 70)
-            localStorage.setItem('category4', 70)
+            localStorage.setItem('category1', 0)
+            localStorage.setItem('category2', 0)
+            localStorage.setItem('category3', 0)
+            localStorage.setItem('category4', 0)
             localStorage.setItem('currentScore', 0)
             localStorage.setItem('bestScore', 0)
             localStorage.setItem('lastEnterTime', Date.now())
+
+            // localStorage.setItem('catchingOfThingsScore', 0)
+            localStorage.setItem('catchingOfThingsBestScore', 0)
 
             firstIn = true
         } else {
@@ -153,6 +162,8 @@ const InitialView = () => {
         bridge.send('VKWebAppGetUserInfo')
             .then((data) => {
 
+                setUser(data)
+
                 // RECIVE AND SEND
                 const q = query(collection(fireStore, "users"), where("id", "==", data.id))
                 // const q = query(collection(fireStore, "users"), where("bestScore", "==", 0))
@@ -170,11 +181,14 @@ const InitialView = () => {
                                 bestScore: Number(localStorage.getItem('bestScore')),
                                 id: inf[0].data().id
                             })
+                        } else {
+                            localStorage.setItem('bestScore', Number(serverBestScore))
                         }
+
                     } else {
 
                         console.error("First sing person", inf.length)
-                        console.error(data.id, localStorage.getItem("bestScore"))
+                        // console.error(data.id, localStorage.getItem("bestScore"))
 
                         sendData({
                             first_name: data.first_name,
@@ -256,6 +270,7 @@ const InitialView = () => {
                 break
             case 4:
                 set = Bw0and100(Number(localStorage.getItem("category4")), add)
+                console.log(Number(localStorage.getItem("category4")), set)
                 localStorage.setItem('category4', set)
                 setCategory4(set)
                 break
@@ -280,7 +295,7 @@ const InitialView = () => {
                 break
         }
 
-        if (set !== 100){
+        if (set !== 100) {
             localStorage.setItem("currentScore", Bw0(Number(localStorage.getItem("currentScore")), add));
             setCurrentScore(localStorage.getItem('currentScore'))
         }
@@ -304,7 +319,7 @@ const InitialView = () => {
                 <AppRoot>
                     <SplitLayout popout={popout}>
 
-                        {!popout && <Epic
+                        <Epic
                             activeStory={activePanel}
                             tabbar={
 
@@ -331,7 +346,7 @@ const InitialView = () => {
                             }
                         >
 
-                            <View id={'game'} activePanel={'game'}>
+                            <View id={'game'} activePanel={catchingOfThings}>
 
                                 <Panel id={'game'}>
                                     <PanelHeader>Tamagotchi</PanelHeader>
@@ -421,7 +436,7 @@ const InitialView = () => {
                                             after={<Icon28AddOutline/>}
                                             onClick={
                                                 () => {
-                                                    updateStorage(4, 2)
+                                                    setCatchingOfThings("catchingOfThings")
                                                 }
                                             }
                                         >
@@ -435,16 +450,24 @@ const InitialView = () => {
 
 
                                 </Panel>
+
+                                <Panel id="catchingOfThings">
+
+                                    <СatchingOfThings setCatchingOfThings={setCatchingOfThings} updateStorage={updateStorage}/>
+
+
+                                </Panel>
+
                             </View>
 
                             <View id={'results'} activePanel={'results'}>
                                 <Panel id={'results'}>
 
-                                    fetchedUser && <Results sendData={sendData} userInfo={fetchedUser}/>
+                                    {fetchedUser && <Results sendData={sendData} userInfo={fetchedUser}/>}
                                 </Panel>
                             </View>
 
-                        </Epic>}
+                        </Epic>
 
 
                     </SplitLayout>

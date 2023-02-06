@@ -38,7 +38,7 @@ const Results = (props) => {
         const q = query(collection(fireStore, "users"), orderBy('bestScore', 'desc'), limit(50));
 
         // console.log("ref", ref)
-        console.log("q", q)
+        // console.log("q", q)
 
         let topId = []
         let topBestScore = []
