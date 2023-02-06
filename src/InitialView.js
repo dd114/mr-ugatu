@@ -12,7 +12,13 @@ import {
     Cell, Avatar, Progress, FormItem, PanelHeaderBack, CellButton, usePlatform, Platform
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import {Icon24GameOutline, Icon28NewsfeedOutline, Icon28AddOutline, Icon28LikeFillRed} from "@vkontakte/icons";
+import {
+    Icon24GameOutline,
+    Icon28NewsfeedOutline,
+    Icon28AddOutline,
+    Icon28LikeFillRed,
+    Icon24ServicesOutline
+} from "@vkontakte/icons";
 
 
 import Results from "./Results";
@@ -224,6 +230,7 @@ const InitialView = () => {
             updateStorage(5, -1)
             console.log("setInterval!")
         }, countDownPerPercent)
+
     }, [])
 
 
@@ -295,9 +302,16 @@ const InitialView = () => {
                 break
         }
 
-        if (set !== 100) {
-            localStorage.setItem("currentScore", Bw0(Number(localStorage.getItem("currentScore")), add));
+        if (set !== 100 && add > 0) { // можно переписать более красиво
+            console.log("Now 1")
+            localStorage.setItem("currentScore", Bw0(Number(localStorage.getItem("currentScore")), add))
             setCurrentScore(localStorage.getItem('currentScore'))
+        } else if (add < 0 && ((Number(localStorage.getItem("category1")) === 0) || Number(localStorage.getItem("category2")) === 0
+            || Number(localStorage.getItem("category3")) === 0 || Number(localStorage.getItem("category4")) === 0)){
+            console.log("Now 21", localStorage.getItem('currentScore'))
+            localStorage.setItem("currentScore", Bw0(Number(localStorage.getItem("currentScore")), add))
+            setCurrentScore(localStorage.getItem('currentScore'))
+            console.log("Now 22", localStorage.getItem('currentScore'))
         }
 
         if (Number(localStorage.getItem('bestScore')) < Number(localStorage.getItem('currentScore'))) {
@@ -331,7 +345,7 @@ const InitialView = () => {
                                         data-story="game"
                                         text="Game"
                                     >
-                                        <Icon24GameOutline/>
+                                        <Icon24ServicesOutline/>
                                     </TabbarItem>
                                     <TabbarItem
                                         onClick={onStoryChange}
@@ -433,7 +447,7 @@ const InitialView = () => {
                                             // before={fetchedUser.photo_200 ?
                                             //     <Avatar src={fetchedUser.photo_200}/> : null}
                                             description={"Роберт Фаридович будет доволен"}
-                                            after={<Icon28AddOutline/>}
+                                            after={<Icon24GameOutline/>}
                                             onClick={
                                                 () => {
                                                     setCatchingOfThings("catchingOfThings")
@@ -463,7 +477,7 @@ const InitialView = () => {
                             <View id={'results'} activePanel={'results'}>
                                 <Panel id={'results'}>
 
-                                    {fetchedUser && <Results sendData={sendData} userInfo={fetchedUser}/>}
+                                    {fetchedUser && <Results sendData={sendData} userInfo={fetchedUser} reciveData={reciveData}/>}
                                 </Panel>
                             </View>
 
