@@ -327,7 +327,9 @@ const CatchingOfThings = (props) => {
         <React.Fragment>
             {/*<canvas id="backgroundCanvas" width="1024" height="650"></canvas>*/}
 
-            <PanelHeaderBack id="headerBack" onClick={() => props.setCatchingOfThings('game')}/>
+            <PanelHeader id="headerBack" left={<PanelHeaderBack onClick={() => props.setCatchingOfThings('game')}/>}>
+                Участие в мероприятиях
+            </PanelHeader>
 
             <canvas id="canvas"></canvas>
         </React.Fragment>

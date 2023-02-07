@@ -76,7 +76,7 @@ const InitialView = () => {
     const platform = usePlatform();
 
 
-    let firstIn, countDownPerPercent = 10 * 1000
+    let firstIn, countDownPerPercent = 60 * 1000
 
     const onStoryChange = (e) => {
         setActivePanel(e.currentTarget.dataset.story)
@@ -456,7 +456,7 @@ const InitialView = () => {
                                         <Cell
                                             // before={fetchedUser.photo_200 ?
                                             //     <Avatar src={fetchedUser.photo_200}/> : null}
-                                            description={"Блин, нужно же еще и диплом писать!"}
+                                            description={"Блин, надо же еще и диплом писать!"}
                                             after={<Icon28AddOutline/>}
                                             onClick={
                                                 () => {
@@ -516,26 +516,54 @@ const InitialView = () => {
                             <View id={'rules'} activePanel={'rules'}>
                                 <Panel id={'rules'}>
                                     <PanelHeader>Правила</PanelHeader>
-                                    <Group mode="plain"
+                                    <Group mode="card"
                                            header={<Header mode="secondary">Играл в Тамагочи?</Header>}
                                     >
                                         <CardGrid size="l">
+
+                                            <Card mode="shadow">
+
+                                                <div style={{height: 15}}/>
+                                                Марсель это ваш личный мистер, управляя за которого, вы должны
+                                                заработать как можно больше баллов
+                                                <div style={{height: 15}}/>
+
+                                            </Card>
+
                                             <Card>
 
                                                 <div style={{height: 15}}/>
-                                                1) Прокачка Марселя состоит из нескольких этапов, где первые 3
+                                                1) Прокачка марселя состоит из нескольких этапов, где первые 3
                                                 прокачиваются кликами, последняя же "участием" в университетских
-                                                мероприятиях, за каждый из них дается 1 балл.
-                                                <Div/>
+                                                мероприятиях, за каждый из которых дается 1 балл
+                                                <div style={{height: 15}}/>
+
+                                            </Card>
+
+                                            <Card>
+
+                                                <div style={{height: 15}}/>
                                                 2) При пропуске 5 мероприятий, игра оканчивается, но можно начать еще
                                                 раз
-                                                <Div/>
+                                                <div style={{height: 15}}/>
+
+                                            </Card>
+
+                                            <Card>
+
+                                                <div style={{height: 15}}/>
                                                 3) Каждые {countDownPerPercent / 1000} секунд (даже если ты не
                                                 пользуешься приложением) уменьшается каждый из показателей на 1%,
                                                 поэтому нужно следить за вашем мистером, иначе если он упадет до нуля,
                                                 то текущий балл уменьшается
-                                                <Div/>
-                                                4) Лучшие 50 тостигнутых результатов войдут в топ лист
+                                                <div style={{height: 15}}/>
+
+                                            </Card>
+
+                                            <Card>
+
+                                                <div style={{height: 15}}/>
+                                                4) Лучшие 50 достигнутых результатов войдут в топ лист
                                                 <div style={{height: 15}}/>
 
                                             </Card>
