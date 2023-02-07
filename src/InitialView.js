@@ -7,17 +7,33 @@ import {
     AppRoot,
     ConfigProvider,
     SplitLayout,
-    Epic, TabbarItem, Tabbar,
-    PanelHeader, Group, ScreenSpinner,
-    Cell, Avatar, Progress, FormItem, PanelHeaderBack, CellButton, usePlatform, Platform
+    Epic,
+    TabbarItem,
+    Tabbar,
+    PanelHeader,
+    Group,
+    ScreenSpinner,
+    Cell,
+    Avatar,
+    Progress,
+    FormItem,
+    PanelHeaderBack,
+    CellButton,
+    usePlatform,
+    Platform,
+    Badge,
+    CardGrid,
+    Card,
+    Header,
+    Div
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import {
     Icon24GameOutline,
-    Icon28NewsfeedOutline,
+    Icon20BookSpreadOutline,
     Icon28AddOutline,
-    Icon28LikeFillRed,
-    Icon24ServicesOutline
+    Icon24ServicesOutline,
+    Icon24ListNumberOutline, Icon28ListOutline, Icon24MoreHorizontal
 } from "@vkontakte/icons";
 
 
@@ -46,7 +62,7 @@ const InitialView = () => {
     const [activePanel, setActivePanel] = useState('game')
     const [scheme, setScheme] = useState('bright_light')
     const [fetchedUser, setUser] = useState(null)
-    const [popout, setPopout] = useState(<ScreenSpinner state="loading"/>);
+    // const [popout, setPopout] = useState(<ScreenSpinner state="loading"/>);
 
     const [category1, setCategory1] = useState(null)
     const [category2, setCategory2] = useState(null)
@@ -83,6 +99,7 @@ const InitialView = () => {
     }, [])
 
     const reciveData = async (q) => {
+        console.log("reciveData has started")
 
         const inf = []
 
@@ -204,6 +221,9 @@ const InitialView = () => {
                         })
                         console.error("First sing person2")
 
+                        // Чтобы я мог управлять удалением результата с сервера
+                        localStorage.setItem('bestScore', 0)
+
                     }
 
                 }).catch(error => {
@@ -224,7 +244,7 @@ const InitialView = () => {
         setCurrentScore(localStorage.getItem('currentScore'))
 
 
-        setPopout(null)
+        // setPopout(null)
 
         setInterval(() => {
             updateStorage(5, -1)
@@ -303,15 +323,15 @@ const InitialView = () => {
         }
 
         if (set !== 100 && add > 0) { // можно переписать более красиво
-            console.log("Now 1")
+            // console.log("Now 1")
             localStorage.setItem("currentScore", Bw0(Number(localStorage.getItem("currentScore")), add))
             setCurrentScore(localStorage.getItem('currentScore'))
         } else if (add < 0 && ((Number(localStorage.getItem("category1")) === 0) || Number(localStorage.getItem("category2")) === 0
-            || Number(localStorage.getItem("category3")) === 0 || Number(localStorage.getItem("category4")) === 0)){
-            console.log("Now 21", localStorage.getItem('currentScore'))
+            || Number(localStorage.getItem("category3")) === 0 || Number(localStorage.getItem("category4")) === 0)) {
+            // console.log("Now 21", localStorage.getItem('currentScore'))
             localStorage.setItem("currentScore", Bw0(Number(localStorage.getItem("currentScore")), add))
             setCurrentScore(localStorage.getItem('currentScore'))
-            console.log("Now 22", localStorage.getItem('currentScore'))
+            // console.log("Now 22", localStorage.getItem('currentScore'))
         }
 
         if (Number(localStorage.getItem('bestScore')) < Number(localStorage.getItem('currentScore'))) {
@@ -331,7 +351,7 @@ const InitialView = () => {
         <ConfigProvider appearance={scheme}>
             <AdaptivityProvider>
                 <AppRoot>
-                    <SplitLayout popout={popout}>
+                    <SplitLayout popout={null}>
 
                         <Epic
                             activeStory={activePanel}
@@ -343,17 +363,28 @@ const InitialView = () => {
                                         onClick={onStoryChange}
                                         selected={activePanel === "game"}
                                         data-story="game"
-                                        text="Game"
+                                        text="Игра"
                                     >
-                                        <Icon24ServicesOutline/>
+                                        <Icon24ServicesOutline width={24} height={24}/>
                                     </TabbarItem>
+
                                     <TabbarItem
                                         onClick={onStoryChange}
                                         selected={activePanel === "results"}
                                         data-story="results"
-                                        text="Top"
+                                        text="Топ"
                                     >
-                                        <Icon28NewsfeedOutline/>
+                                        <Icon28ListOutline width={24} height={24}/>
+                                    </TabbarItem>
+
+                                    <TabbarItem
+                                        onClick={onStoryChange}
+                                        selected={activePanel === "rules"}
+                                        data-story="rules"
+                                        text="Правила"
+                                        indicator={<Badge mode="prominent" aria-label="Надо прочесть"/>}
+                                    >
+                                        <Icon24MoreHorizontal width={24} height={24}/>
                                     </TabbarItem>
                                 </Tabbar>
 
@@ -467,19 +498,54 @@ const InitialView = () => {
 
                                 <Panel id="catchingOfThings">
 
-                                    <СatchingOfThings setCatchingOfThings={setCatchingOfThings} updateStorage={updateStorage}/>
+                                    <СatchingOfThings setCatchingOfThings={setCatchingOfThings}
+                                                      updateStorage={updateStorage}/>
 
 
                                 </Panel>
-
                             </View>
 
                             <View id={'results'} activePanel={'results'}>
                                 <Panel id={'results'}>
 
-                                    {fetchedUser && <Results sendData={sendData} userInfo={fetchedUser} reciveData={reciveData}/>}
+                                    {fetchedUser && <Results sendData={sendData} userInfo={fetchedUser}
+                                                             reciveData={reciveData}/>}
                                 </Panel>
                             </View>
+
+                            <View id={'rules'} activePanel={'rules'}>
+                                <Panel id={'rules'}>
+                                    <PanelHeader>Правила</PanelHeader>
+                                    <Group mode="plain"
+                                           header={<Header mode="secondary">Играл в Тамагочи?</Header>}
+                                    >
+                                        <CardGrid size="l">
+                                            <Card>
+
+                                                <div style={{height: 15}}/>
+                                                1) Прокачка Марселя состоит из нескольких этапов, где первые 3
+                                                прокачиваются кликами, последняя же "участием" в университетских
+                                                мероприятиях, за каждый из них дается 1 балл.
+                                                <Div/>
+                                                2) При пропуске 5 мероприятий, игра оканчивается, но можно начать еще
+                                                раз
+                                                <Div/>
+                                                3) Каждые {countDownPerPercent / 1000} секунд (даже если ты не
+                                                пользуешься приложением) уменьшается каждый из показателей на 1%,
+                                                поэтому нужно следить за вашем мистером, иначе если он упадет до нуля,
+                                                то текущий балл уменьшается
+                                                <Div/>
+                                                4) Лучшие 50 тостигнутых результатов войдут в топ лист
+                                                <div style={{height: 15}}/>
+
+                                            </Card>
+                                        </CardGrid>
+                                    </Group>
+
+                                </Panel>
+
+                            </View>
+
 
                         </Epic>
 

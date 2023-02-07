@@ -20,11 +20,11 @@ import fireStore from "./DB";
 
 import back from './images/background.jpg'
 import marsel from './images/marsel.png'
-import melon2 from './images/melon2.png'
-import pineapple2 from './images/pineapple2.png'
-import orange2 from './images/orange2.png'
-import apple2 from './images/apple2.png'
-import banana2 from './images/banana2.png'
+import melon2 from './images/logo1.png'
+import pineapple2 from './images/logo2.png'
+import orange2 from './images/logo3.png'
+import apple2 from './images/logo4.png'
+import banana2 from './images/logo5.png'
 
 
 const CatchingOfThings = (props) => {
@@ -54,7 +54,7 @@ const CatchingOfThings = (props) => {
 
         let player;
         let fruits = [];
-        let numberOfFruits = 5;
+        let numberOfFruits = 7;
 
         //Player constructor
         function Player() {
@@ -63,7 +63,7 @@ const CatchingOfThings = (props) => {
             this.fruitsCollected = 0;
             this.fruitsMissed = 0;
             this.playerWidth = 100;
-            this.playerHeight = 120;
+            this.playerHeight = 150;
             this.playerSpeed = 5;
             this.x = canvas.width / 2;
             this.y = canvas.height - this.playerHeight;
@@ -170,7 +170,7 @@ const CatchingOfThings = (props) => {
 
             //Draws the fruit.
             this.render = function () {
-                context.drawImage(this.fruitImage, this.x, this.y);
+                context.drawImage(this.fruitImage, this.x, this.y, this.fruitWidth, this.fruitHeight);
             }
         }
 
@@ -178,7 +178,7 @@ const CatchingOfThings = (props) => {
 
         //Перехватываем события
 
-        document.addEventListener("touchstart", function (e) {
+        canvas.addEventListener("touchstart", function (e) {
 
 
             if (player.gameOver === false) {
@@ -186,20 +186,20 @@ const CatchingOfThings = (props) => {
 
 
                 if (x <= canvas.width / 2) {
-                    touches.push(window.setInterval(() => player.moveLeft(), 20))
+                    touches.push(window.setInterval(() => player.moveLeft(), 15))
                 } else {
-                    touches.push(window.setInterval(() => player.moveRight(), 20))
+                    touches.push(window.setInterval(() => player.moveRight(), 15))
                 }
 
             } else {
                 window.clearTimeout(timer);
-                main(true);
+                main();
             }
 
 
-        });
+        })
 
-        document.addEventListener("touchend", function (e) {
+        canvas.addEventListener("touchend", function (e) {
             touches.forEach((touch) => window.clearTimeout(touch))
             touches.length = 0
         });
@@ -216,33 +216,32 @@ const CatchingOfThings = (props) => {
         // }); //Движение пальцем по экрану
 
 
-        main(true);
+        main()
 
         //Fills an array of fruits, creates a player and starts the game
-        function main(isStartGame) {
+        function main() {
 
 
-            context.font = "bold 20px Velvetica";
+            context.font = "bold 13px Velvetica";
             context.fillStyle = "black";
 
             player = new Player();
             fruits = []
 
-            if (isStartGame === true) {
-                player.gameOver = false
 
-                for (let i = 0; i < numberOfFruits; i++) {
-                    let fruit = new Fruit();
-                    fruit.chooseFruit();
-                    fruits.push(fruit);
-                }
+            player.gameOver = false
+
+            for (let i = 0; i < numberOfFruits; i++) {
+                let fruit = new Fruit();
+                fruit.chooseFruit();
+                fruits.push(fruit);
             }
 
 
-            startGame(isStartGame);
+            startGame();
         }
 
-        function startGame(isStartGame) {
+        function startGame() {
             context.drawImage(background, 0, 0, canvas.width, canvas.height)
 
             timer = setInterval(updateGame, 30)
@@ -258,9 +257,8 @@ const CatchingOfThings = (props) => {
                 player.gameOver = true;
             }
 
-            for (let j = 0; j < fruits.length; j++) {
-                fruits[j].fall();
-            }
+            fruits.forEach((el) => el.fall())
+
         }
 
 
@@ -276,14 +274,14 @@ const CatchingOfThings = (props) => {
 
                 player.render();
 
-                for (let j = 0; j < fruits.length; j++) {
-                    fruits[j].render();
-                }
+
+                fruits.forEach((el) => el.render())
+
 
                 context.fillText("SCORE: " + player.score, 20, 50);
-                context.fillText("BEST SCORE: " + hiscore, canvas.width / 6 * 3 - 80, 50);
+                context.fillText("BEST SCORE: " + hiscore, canvas.width / 6 * 3 - 55, 50);
                 // context.fillText("FRUIT CAUGHT: " + player.fruitsCollected, canvas.width / 6 * 3, 50);
-                context.fillText("MISSED: " + player.fruitsMissed, canvas.width - 120, 50);
+                context.fillText("MISSED: " + player.fruitsMissed, canvas.width - 85, 50);
 
                 window.requestAnimationFrame(drawGame);
 
@@ -309,12 +307,12 @@ const CatchingOfThings = (props) => {
 
                 context.drawImage(background, 0, 0, canvas.width, canvas.height)
 
-                context.fillText("TOUCH TO START", (canvas.width / 2) - 80, canvas.height / 3);
+                context.fillText("TOUCH TO START", (canvas.width / 2) - 55, canvas.height / 3);
 
                 context.fillText("SCORE: " + player.score, 20, 50);
-                context.fillText("BEST SCORE: " + hiscore, canvas.width / 6 * 3 - 80, 50);
+                context.fillText("BEST SCORE: " + hiscore, canvas.width / 6 * 3 - 55, 50);
                 // context.fillText("FRUIT CAUGHT: " + player.fruitsCollected, canvas.width / 6 * 3, 50);
-                context.fillText("MISSED: " + player.fruitsMissed, canvas.width - 120, 50);
+                context.fillText("MISSED: " + player.fruitsMissed, canvas.width - 85, 50);
 
                 props.updateStorage(4, player.score)
 

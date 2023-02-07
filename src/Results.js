@@ -17,13 +17,14 @@ import {
     onSnapshot
 } from "firebase/firestore";
 import fireStore from "./DB";
+import {element} from "prop-types";
 
 
 const Results = (props) => {
 
     const [fullInformation, setFullInformation] = useState([])
 
-    useEffect(() => {
+    useEffect(async () => {
 
         props.sendData({
             first_name: props.userInfo.first_name,
@@ -40,53 +41,47 @@ const Results = (props) => {
         // console.log("ref", ref)
         // console.log("q", q)
 
-        let topId = []
+        const topId = []
         let topBestScore = []
 
-        onSnapshot(q, (snap) => {
-            console.log("snap", snap)
-            console.log("snap.docs", snap.docs)
-            snap.docs.forEach(element => {
-                let id = element._document.data.value.mapValue.fields.id.integerValue
-                let bestScore = element._document.data.value.mapValue.fields.bestScore.integerValue
-                console.log("element", id)
-                topId.push(id)
-                topBestScore.push(bestScore)
-            })
+        let inf = await props.reciveData(q)
 
-            // console.log("top", topId)
+        inf.forEach((el) => {
+            topId.push(el.data().id)
+            topBestScore.push(el.data().bestScore)
+        })
 
 
-            bridge.send("VKWebAppCallAPIMethod", {
-                "method": "users.get",
-                "request_id": "32test",
-                "params": {
-                    "user_ids": topId.join(','),
-                    "v": "5.131",
-                    "fields": "photo_100",
-                    "access_token": "43d622264f5270475b941c24bc117d252490fe0d97ef581ec7b44321cb1f3df7aa970bf00bc50d4e641db"
-                }
-            }).then((data) => {
-                // console.log("data", data)
+        console.log(inf)
 
-                data.response.map((el, i) => {
-                    tempArr.push({
-                        id: el.id, first_name: el.first_name,
-                        last_name: el.last_name, ava: el.photo_100, bestScore: topBestScore[i]
-                    })
+
+        bridge.send("VKWebAppCallAPIMethod", {
+            "method": "users.get",
+            "request_id": "32test",
+            "params": {
+                "user_ids": topId.join(','),
+                "v": "5.131",
+                "fields": "photo_100",
+                "access_token": "43d622264f5270475b941c24bc117d252490fe0d97ef581ec7b44321cb1f3df7aa970bf00bc50d4e641db"
+            }
+        }).then((data) => {
+            // console.log("data", data)
+
+            data.response.map((el, i) => {
+                tempArr.push({
+                    id: el.id, first_name: el.first_name,
+                    last_name: el.last_name, ava: el.photo_100, bestScore: topBestScore[i]
                 })
-
-                console.log("tempArr", tempArr)
-                console.log("topBestScore", topBestScore)
-
-                setFullInformation(tempArr)
-                // fullInformation.length = 0
-            }).catch((error) => {
-                // Ошибка
-                console.error(error);
             })
 
+            console.log("tempArr", tempArr)
+            console.log("topBestScore", topBestScore)
 
+            setFullInformation(tempArr)
+            // fullInformation.length = 0
+        }).catch((error) => {
+            // Ошибка
+            console.error(error);
         })
 
 
@@ -94,7 +89,7 @@ const Results = (props) => {
 
     return (
         <React.Fragment>
-            <PanelHeader>Best players</PanelHeader>
+            <PanelHeader>Лучшие игроки</PanelHeader>
             <Group>
                 {fullInformation.map(
                     (v, i) => {
