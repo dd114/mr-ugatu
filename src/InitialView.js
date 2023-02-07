@@ -38,7 +38,7 @@ import {
 
 
 import Results from "./Results";
-import СatchingOfThings from "./СatchingOfThings";
+import CatchingOfThings from "./CatchingOfThings";
 
 import fireStore from "./DB";
 import {
@@ -72,8 +72,6 @@ const InitialView = () => {
     const [currentScore, setCurrentScore] = useState(null)
 
     const [catchingOfThings, setCatchingOfThings] = useState("game")
-
-    const platform = usePlatform();
 
 
     let firstIn, countDownPerPercent = 60 * 1000
@@ -152,10 +150,12 @@ const InitialView = () => {
             || isNaN(localStorage.getItem('currentScore')) || isNaN(localStorage.getItem('bestScore'))
             || isNaN(localStorage.getItem('lastEnterTime'))) {
 
-            localStorage.setItem('category1', 0)
-            localStorage.setItem('category2', 0)
-            localStorage.setItem('category3', 0)
-            localStorage.setItem('category4', 0)
+            let initialValueForCategories = 70
+
+            localStorage.setItem('category1', initialValueForCategories)
+            localStorage.setItem('category2', initialValueForCategories)
+            localStorage.setItem('category3', initialValueForCategories)
+            localStorage.setItem('category4', initialValueForCategories)
             localStorage.setItem('currentScore', 0)
             localStorage.setItem('bestScore', 0)
             localStorage.setItem('lastEnterTime', Date.now())
@@ -498,7 +498,7 @@ const InitialView = () => {
 
                                 <Panel id="catchingOfThings">
 
-                                    <СatchingOfThings setCatchingOfThings={setCatchingOfThings}
+                                    <CatchingOfThings setCatchingOfThings={setCatchingOfThings}
                                                       updateStorage={updateStorage}/>
 
 

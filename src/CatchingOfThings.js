@@ -25,6 +25,7 @@ import pineapple2 from './images/logo2.png'
 import orange2 from './images/logo3.png'
 import apple2 from './images/logo4.png'
 import banana2 from './images/logo5.png'
+import logo6 from './images/logo6.png'
 
 
 const CatchingOfThings = (props) => {
@@ -92,7 +93,7 @@ const CatchingOfThings = (props) => {
 
         //Fruit constructor
         function Fruit() {
-            this.fruitNumber = Math.floor(Math.random() * 5);
+            this.fruitNumber = Math.floor(Math.random() * 6);
             this.fruitType = "";
             this.fruitScore = 0;
             this.fruitWidth = 50;
@@ -105,26 +106,30 @@ const CatchingOfThings = (props) => {
             //Creates a different kind of fruit depending on the fruit number
             //which is generated randomly
             this.chooseFruit = function () {
-                if (this.fruitNumber == 0) {
+                if (this.fruitNumber === 0) {
                     this.fruitType = "banana";
                     this.fruitScore = 1;
                     this.fruitImage.src = banana2
-                } else if (this.fruitNumber == 1) {
+                } else if (this.fruitNumber === 1) {
                     this.fruitType = "apple";
                     this.fruitScore = 1
                     this.fruitImage.src = apple2
-                } else if (this.fruitNumber == 2) {
+                } else if (this.fruitNumber === 2) {
                     this.fruitType = "orange";
                     this.fruitScore = 1;
                     this.fruitImage.src = orange2
-                } else if (this.fruitNumber == 3) {
+                } else if (this.fruitNumber === 3) {
                     this.fruitType = "pineapple";
                     this.fruitScore = 1;
                     this.fruitImage.src = pineapple2
-                } else if (this.fruitNumber == 4) {
+                } else if (this.fruitNumber === 4) {
                     this.fruitType = "melon";
                     this.fruitScore = 1;
                     this.fruitImage.src = melon2
+                } else if (this.fruitNumber === 5) {
+                    this.fruitType = "mr usatu";
+                    this.fruitScore = 2;
+                    this.fruitImage.src = logo6
                 }
 
                 // console.log("this.fruitScore", this.fruitScore)
