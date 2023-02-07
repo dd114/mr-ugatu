@@ -54,7 +54,7 @@ const CatchingOfThings = (props) => {
 
         let player;
         let fruits = [];
-        let numberOfFruits = 7;
+        let numberOfFruits = 9;
 
         //Player constructor
         function Player() {
@@ -222,7 +222,7 @@ const CatchingOfThings = (props) => {
         function main() {
 
 
-            context.font = "bold 13px Velvetica";
+            context.font = "bold 17px Velvetica";
             context.fillStyle = "black";
 
             player = new Player();
@@ -244,7 +244,7 @@ const CatchingOfThings = (props) => {
         function startGame() {
             context.drawImage(background, 0, 0, canvas.width, canvas.height)
 
-            timer = setInterval(updateGame, 30)
+            timer = setInterval(updateGame, 40)
 
             requestAnimationFrame(drawGame)
 
@@ -277,11 +277,12 @@ const CatchingOfThings = (props) => {
 
                 fruits.forEach((el) => el.render())
 
+                // context.fillText("TOUCH TO START", (canvas.width / 2) - 75, canvas.height / 3);
 
                 context.fillText("SCORE: " + player.score, 20, 50);
-                context.fillText("BEST SCORE: " + hiscore, canvas.width / 6 * 3 - 55, 50);
+                context.fillText("BEST SCORE: " + hiscore, canvas.width / 6 * 3 - 65, 50);
                 // context.fillText("FRUIT CAUGHT: " + player.fruitsCollected, canvas.width / 6 * 3, 50);
-                context.fillText("MISSED: " + player.fruitsMissed, canvas.width - 85, 50);
+                context.fillText("MISSED: " + player.fruitsMissed, canvas.width - 95, 50);
 
                 window.requestAnimationFrame(drawGame);
 
@@ -307,12 +308,12 @@ const CatchingOfThings = (props) => {
 
                 context.drawImage(background, 0, 0, canvas.width, canvas.height)
 
-                context.fillText("TOUCH TO START", (canvas.width / 2) - 55, canvas.height / 3);
+                context.fillText("TOUCH TO START", (canvas.width / 2) - 75, canvas.height / 3);
 
                 context.fillText("SCORE: " + player.score, 20, 50);
-                context.fillText("BEST SCORE: " + hiscore, canvas.width / 6 * 3 - 55, 50);
+                context.fillText("BEST SCORE: " + hiscore, canvas.width / 6 * 3 - 65, 50);
                 // context.fillText("FRUIT CAUGHT: " + player.fruitsCollected, canvas.width / 6 * 3, 50);
-                context.fillText("MISSED: " + player.fruitsMissed, canvas.width - 85, 50);
+                context.fillText("MISSED: " + player.fruitsMissed, canvas.width - 95, 50);
 
                 props.updateStorage(4, player.score)
 
@@ -328,7 +329,7 @@ const CatchingOfThings = (props) => {
             {/*<canvas id="backgroundCanvas" width="1024" height="650"></canvas>*/}
 
             <PanelHeader id="headerBack" left={<PanelHeaderBack onClick={() => props.setCatchingOfThings('game')}/>}>
-                Участие в мероприятиях
+                Мероприятия
             </PanelHeader>
 
             <canvas id="canvas"></canvas>
